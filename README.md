@@ -6,6 +6,9 @@ This is a custom repository that contains examples of custom policies to interac
 
 ![Login or signin](./assets/images/login-interface.png)
 
+The response:
+
+![Decoded token](./assets/images/decoded-token.png)
 ## The TrustFrameworkPolicy Schema
 
 The policies are defined into an XML format.
