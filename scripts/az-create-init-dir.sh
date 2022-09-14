@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RESOURCE_GROUP_NAME=tfstate
+RESOURCE_GROUP_NAME=rg-terraform-state-cb001
 STORAGE_ACCOUNT_NAME=tfstate$RANDOM
 CONTAINER_NAME=tfstate
 LOCATION=francecentral
