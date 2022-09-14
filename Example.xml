@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- TenantId: Tenant where the policy is stored, PolicyId: id as a reference,
+ PublicPolicyUri:  URI that will be used to reference this policy when it 
+ is deployed -->
+<TrustFrameworkPolicy
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
+  PolicySchemaVersion="0.3.0.0"
+  TenantId="thegreatcompanyb2c.onmicrosoft.com"
+  PolicyId="B2C_1A_Example"
+  PublicPolicyUri="http://thegreatcompanyb2c.onmicrosoft.com/B2C_1A_Example">
+    <BuildingBlocks>
+      <ClaimsSchema>
+        <ClaimType Id="objectId">
+          <DataType>string</DataType>
+        </ClaimType>
+        <ClaimType Id="message">
+          <DataType>string</DataType>
+        </ClaimType>
+      </ClaimsSchema>
+    </BuildingBlocks>
+    <ClaimsProviders>
+      <ClaimsProvider>
+        <!-- The technical profile(s) defined in this section is required by the framework to be included in all policies. -->
+        <DisplayName>Trustframework Policy Engine TechnicalProfiles</DisplayName>
+        <TechnicalProfiles>
+          <TechnicalProfile Id="TpEngine_c3bd4fe2-1775-4013-b91d-35f16d377d13">
+            <DisplayName>Trustframework Policy Engine Default Technical Profile</DisplayName>
+            <Protocol Name="None" />
+            <Metadata>
+              <Item Key="url">{service:te}</Item>
+            </Metadata>
+          </TechnicalProfile>
+        </TechnicalProfiles>
+      </ClaimsProvider>
+      <ClaimsProvider>
+        <!-- 
+        The technical profile(s) defined in this section specify Token Issuers that are used by the required SendClaims step of a User Journey 
+        to return a token to the caller.
+        -->
+        <DisplayName>Token Issuer Technical Profiles</DisplayName>
+        <TechnicalProfiles>
+          <TechnicalProfile Id="JwtIssuer">
+            <DisplayName>JWT Issuer</DisplayName>
+            <Protocol Name="None" />
+            <OutputTokenFormat>JWT</OutputTokenFormat>
+            <Metadata>
+              <Item Key="client_id">{service:te}</Item>
+              <Item Key="issuer_refresh_token_user_identity_claim_type">objectId</Item>
+              <Item Key="SendTokenResponseBodyWithJsonNumbers">true</Item>
+            </Metadata>
+            <CryptographicKeys>
+              <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+              <Key Id="issuer_refresh_token_key" StorageReferenceId="B2C_1A_TokenEncryptionKeyContainer" />
+            </CryptographicKeys>
+            <InputClaims />
+            <OutputClaims />
+          </TechnicalProfile>
+        </TechnicalProfiles>
+      </ClaimsProvider>
+  </ClaimsProviders>
+  <UserJourneys>
+    <!-- User Journeys specify the steps that a policy will follow when it is called. In this case, 
+    the User Journey has been given the ID HelloWorldJourney, which will be used to reference it 
+    later in the policy -->
+    <UserJourney Id="HelloWorldJourney">
+      <OrchestrationSteps>
+        <OrchestrationStep Order="1" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+      </OrchestrationSteps>
+    </UserJourney>
+  </UserJourneys>
+  <RelyingParty>
+  <!-- The RelyingParty element includes a DefaultUserJourney element that references the HelloWorldJourney User Journey -->
+    <DefaultUserJourney ReferenceId="HelloWorldJourney"/>
+    <TechnicalProfile Id="HelloWorldPolicyProfile">
+      <DisplayName>Hello World Policy Profile</DisplayName>
+      <!-- The OpenIdConnect protocol is to be used for exchanges with this policy -->
+      <Protocol Name="OpenIdConnect" />
+      <OutputClaims>
+        <!-- Two output claims will be added to the JWT token that is being produced by the policy. 
+        The values of these claims are set with the DefaultValue attributes, which will provide a value for a 
+        claim if it has not been previously set. -->
+        <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" DefaultValue="Hello World Object ID"/>
+        <!-- The PartnerClaimType attribute is used to provide a different external name for the 
+        claim than what has been used internally in the policy. In this case, the claim name that will be emitted in the 
+        token is sub instead of objectId -->
+        <OutputClaim ClaimTypeReferenceId="message" DefaultValue="Hello World!"/>
+      </OutputClaims>
+      <SubjectNamingInfo ClaimType="sub" />
+    </TechnicalProfile>
+  </RelyingParty>
+</TrustFrameworkPolicy>

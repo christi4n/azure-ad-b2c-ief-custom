@@ -1,0 +1,24 @@
+<TrustFrameworkPolicy
+    xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="https://www.w3.org/2001/XMLSchema"
+    xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
+    PolicySchemaVersion="0.3.0.0"
+    TenantId="YOUR_TENANT_NAME.onmicrosoft.com"
+    PolicyId="YOUR_POLICY_ID"
+    PublicPolicyUri="http://YOUR_TENANT_NAME.onmicrosoft.com/YOUR_POLICY_ID">
+    <BasePolicy>
+        <!-- Content -->
+    </BasePolicy>
+    <BuildingBlocks>
+        <!-- Content -->
+    </BuildingBlocks>
+    <ClaimsProviders>
+        <!-- Content -->
+    </ClaimsProviders>
+    <UserJourneys>
+        <!-- Content -->
+    </UserJourneys>
+    <RelyingParty>
+        <!-- Content -->
+    </RelyingParty>
+</TrustFrameworkPolicy>
