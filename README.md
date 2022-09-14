@@ -16,4 +16,4 @@ The XML tags belows are part of a AAD B2C policy:
 - **UserJourneys** This section defines the sequence of steps that are executed when the policy is invoked and the conditions under which each step is either invoked or skipped.
 - **RelyingParty** This section defines the behavior of the endpoint that is exposed by the policy. The primary purpose of this element is to define which UserJourney is executed and which claims are returned by the policy, although there are other settings that can also be defined.
 
-Form more information, have a look at the [online documentation](https://docs.microsoft.com/en-us/azure/active-directory-b2c/trustframeworkpolicy)
+Form more information, have a look at the [online documentation](https://docs.microsoft.com/en-us/azure/active-directory-b2c/trustframeworkpolicy).

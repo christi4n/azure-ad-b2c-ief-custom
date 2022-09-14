@@ -18,7 +18,112 @@
         <ClaimType Id="message">
           <DataType>string</DataType>
         </ClaimType>
+        <ClaimType Id="givenName">
+          <DisplayName>First Name</DisplayName>
+          <DataType>string</DataType>
+          <DefaultPartnerClaimTypes>
+            <Protocol Name="OAuth2" PartnerClaimType="given_name" />
+            <Protocol Name="OpenIdConnect" PartnerClaimType="given_name" />
+            <Protocol Name="SAML2" PartnerClaimType="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname" />
+          </DefaultPartnerClaimTypes>
+          <!-- 
+            User Help Text is just that – text that you can provide to be displayed to the users in the policy’s user 
+          interface in order to help them with their data entry
+          -->
+          <UserHelpText>Your first name</UserHelpText>
+          <!-- User Input Type dictates the actual kind of control that will be displayed in the user interface -->
+          <UserInputType>TextBox</UserInputType>
+        </ClaimType>
+        <ClaimType Id="surname">
+          <!-- 
+            DisplayName is used by the IEF runtime to generate the corresponding user-facing label when 
+          the claim is shown in a user interface 
+          -->
+          <DisplayName>Last Name</DisplayName>
+          <DataType>string</DataType>
+          <DefaultPartnerClaimTypes>
+            <Protocol Name="OAuth2" PartnerClaimType="family_name" />
+            <Protocol Name="OpenIdConnect" PartnerClaimType="family_name" />
+            <Protocol Name="SAML2" PartnerClaimType="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname" />
+          </DefaultPartnerClaimTypes>
+          <UserHelpText>Your surname (last name).</UserHelpText>
+          <UserInputType>TextBox</UserInputType>
+        </ClaimType>
+        <ClaimType Id="displayName">
+          <DataType>string</DataType>
+          <DefaultPartnerClaimTypes>
+            <Protocol Name="OAuth2" PartnerClaimType="unique_name" />
+            <Protocol Name="OpenIdConnect" PartnerClaimType="name" />
+            <Protocol Name="SAML2" PartnerClaimType="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" />
+          </DefaultPartnerClaimTypes>
+        </ClaimType>
       </ClaimsSchema>
+      <!-- 
+        Claims Transformations are small operations that are used by the policy “functions” 
+      to set the value of a claim by performing an operation with the given input parameters and/or 
+      input claims. Each transformation specifies the desired operation to be performed via a 
+      TransformationMethod attribute. 
+      -->
+      <ClaimsTransformations>
+        <!--  
+          Each transformation method indicates specific names that must be given for its input and output 
+        parameters. For InputParameter elements, the name is specified in the Id attribute. For outputs, 
+        the name is specified by the TransformationClaimType attribute of an OutputClaim element 
+        -->
+        <ClaimsTransformation Id="GenerateObjectIdTransformation" TransformationMethod="CreateRandomString">
+          <InputParameters>
+            <InputParameter Id="randomGeneratorType" DataType="string" Value="GUID"/>
+          </InputParameters>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="objectId" TransformationClaimType="outputClaim"/>
+          </OutputClaims>
+        </ClaimsTransformation>
+        <!-- 
+          The CreateDisplayNameTransformation transformation indicates a Transformation Method of 
+        FormatStringMultipleClaims – it takes an input parameter that specifies a format string which expects 
+        2 inputs and two input claims that are substituted into the format string to produce the indicated 
+        output claim 
+        -->
+        <ClaimsTransformation Id="CreateDisplayNameTransformation" TransformationMethod="FormatStringMultipleClaims">
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="givenName" TransformationClaimType="inputClaim1"/>
+            <InputClaim ClaimTypeReferenceId="surname" TransformationClaimType="inputClaim2"/>
+          </InputClaims>
+          <InputParameters>
+            <InputParameter Id="stringFormat" DataType="string" Value="{0} {1}"/>
+          </InputParameters>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="displayName" TransformationClaimType="outputClaim"/>
+          </OutputClaims>
+        </ClaimsTransformation>
+        <!-- 
+          The CreateMessageTransformation transformation indicates a Transformation Method of 
+        FormatStringClaim – it takes an input parameter that specifies a format string which expects 
+        1 input and one claim that is substituted into the format string to produce the indicated output claim 
+        -->
+        <ClaimsTransformation Id="CreateMessageTransformation" TransformationMethod="FormatStringClaim">
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="displayName" TransformationClaimType="inputClaim"/>
+          </InputClaims>
+          <InputParameters>
+            <InputParameter Id="stringFormat" DataType="string" Value="Hello {0}"/>
+          </InputParameters>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="message" TransformationClaimType="outputClaim"/>
+          </OutputClaims>
+        </ClaimsTransformation>
+      </ClaimsTransformations>
+      <ContentDefinitions>
+      <!-- 
+        The Content Definition. Content Definitions allow you to specify the HTML templates that govern the overall 
+      layout for the page(s) that will be displayed to users of you policy. 
+      -->
+        <ContentDefinition Id="SelfAssertedContentDefinition">
+          <LoadUri>~/tenant/default/selfAsserted.cshtml</LoadUri>
+          <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+          <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:1.2.0</DataUri>
+        </ContentDefinition>
+      </ContentDefinitions>
     </BuildingBlocks>
     <ClaimsProviders>
       <ClaimsProvider>
@@ -59,11 +164,54 @@
           </TechnicalProfile>
         </TechnicalProfiles>
       </ClaimsProvider>
+      <ClaimsProvider>
+        <!--
+        The technical profiles defined in this section are used to generate values for claims that
+        are being collected as part of the user journey.
+        -->
+        <DisplayName>Claim Generator Technical Profiles</DisplayName>
+        <TechnicalProfiles>
+          <TechnicalProfile Id="RandomObjectIdClaimGenerator">
+            <!--
+            In order for an Object ID to be returned (this is required in an interactive profile) one of the 
+            journey steps must include it as an output claim. 
+            In this case, it is being done as a claims transformation without any input, but 
+            instead is generating a random value using a claims transformation.
+            -->
+            <DisplayName>Random Object ID Claim Generator Technical Profile</DisplayName>
+            <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+            <OutputClaims>
+              <OutputClaim ClaimTypeReferenceId="objectId"/>
+            </OutputClaims>
+            <OutputClaimsTransformations>
+              <OutputClaimsTransformation ReferenceId="GenerateObjectIdTransformation"/>
+            </OutputClaimsTransformations>
+          </TechnicalProfile>
+          <TechnicalProfile Id="UserInputMessageClaimGenerator">
+            <!--
+            Generates the content of the message claim by applying the relevant claims transformation. The Claims 
+            Exchange Technical Profiles used here set our personalized greeting message based on the user’s input
+            -->
+            <DisplayName>Display Name Claim Generator Technical Profile</DisplayName>
+            <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+            <OutputClaims>
+              <OutputClaim ClaimTypeReferenceId="displayName"/>
+              <OutputClaim ClaimTypeReferenceId="message"/>
+            </OutputClaims>
+            <OutputClaimsTransformations>
+              <OutputClaimsTransformation ReferenceId="CreateDisplayNameTransformation"/>
+              <OutputClaimsTransformation ReferenceId="CreateMessageTransformation"/>
+            </OutputClaimsTransformations>
+          </TechnicalProfile>
+        </TechnicalProfiles>
+      </ClaimsProvider>
   </ClaimsProviders>
   <UserJourneys>
-    <!-- User Journeys specify the steps that a policy will follow when it is called. In this case, 
+    <!-- 
+      User Journeys specify the steps that a policy will follow when it is called. In this case, 
     the User Journey has been given the ID HelloWorldJourney, which will be used to reference it 
-    later in the policy -->
+    later in the policy 
+    -->
     <UserJourney Id="HelloWorldJourney">
       <OrchestrationSteps>
         <OrchestrationStep Order="1" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
@@ -78,13 +226,17 @@
       <!-- The OpenIdConnect protocol is to be used for exchanges with this policy -->
       <Protocol Name="OpenIdConnect" />
       <OutputClaims>
-        <!-- Two output claims will be added to the JWT token that is being produced by the policy. 
+        <!-- 
+          Two output claims will be added to the JWT token that is being produced by the policy. 
         The values of these claims are set with the DefaultValue attributes, which will provide a value for a 
-        claim if it has not been previously set. -->
+        claim if it has not been previously set. 
+        -->
         <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" DefaultValue="Hello World Object ID"/>
-        <!-- The PartnerClaimType attribute is used to provide a different external name for the 
+        <!-- 
+          The PartnerClaimType attribute is used to provide a different external name for the 
         claim than what has been used internally in the policy. In this case, the claim name that will be emitted in the 
-        token is sub instead of objectId -->
+        token is sub instead of objectId 
+        -->
         <OutputClaim ClaimTypeReferenceId="message" DefaultValue="Hello World!"/>
       </OutputClaims>
       <SubjectNamingInfo ClaimType="sub" />
