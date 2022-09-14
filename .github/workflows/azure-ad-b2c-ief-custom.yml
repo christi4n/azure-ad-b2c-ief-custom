@@ -1,0 +1,43 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Deploy IEF custom policies for Azure AD B2C
+
+on:
+  push:
+    paths:
+      - 'terraform/*.tf'
+
+  workflow_dispatch:
+
+jobs:
+  resourcegroups:
+    runs-on: ubuntu-latest
+    
+    name: 'Terraform actions'
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.MVP_SUBSCRIPTION }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 'Terraform init'
+        id: init
+        run: |
+          cd terraform
+          terraform init          
+
+      - name: 'Terraform plan'
+        id: plan
+        run: |
+          cd terraform
+          terraform plan
+                    
+      - name: 'Terraform apply'
+        id: apply
+        run: |
+          cd terraform
+          terraform apply -auto-approve
