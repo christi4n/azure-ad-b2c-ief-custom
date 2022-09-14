@@ -205,6 +205,30 @@
           </TechnicalProfile>
         </TechnicalProfiles>
       </ClaimsProvider>
+      <ClaimsProvider>
+        <!--
+        The technical profile defined in this section allows a user to enter their first and last name, 
+        then composes the message text based on those entries.
+        -->
+        <DisplayName>Sample User Input Collection Technical Profiles</DisplayName>
+        <TechnicalProfiles>
+          <TechnicalProfile Id="UserInformationCollector">
+            <DisplayName>Collect Sample User Input Technical Profile</DisplayName>
+            <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+            <Metadata>
+              <Item Key="ContentDefinitionReferenceId">SelfAssertedContentDefinition</Item>
+            </Metadata>
+            <DisplayClaims>
+              <DisplayClaim ClaimTypeReferenceId="givenName" Required="true"/>
+              <DisplayClaim ClaimTypeReferenceId="surname"  Required="true"/>
+            </DisplayClaims>
+            <OutputClaims>
+              <OutputClaim ClaimTypeReferenceId="givenName"/>
+              <OutputClaim ClaimTypeReferenceId="surname"/>
+            </OutputClaims>
+          </TechnicalProfile>
+        </TechnicalProfiles>
+      </ClaimsProvider>
   </ClaimsProviders>
   <UserJourneys>
     <!-- 
@@ -214,7 +238,22 @@
     -->
     <UserJourney Id="HelloWorldJourney">
       <OrchestrationSteps>
-        <OrchestrationStep Order="1" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <OrchestrationStep Order="1" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="GetObjectIdClaimsExchange" TechnicalProfileReferenceId="RandomObjectIdClaimGenerator" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="GetUserInformationClaimsExchange" TechnicalProfileReferenceId="UserInformationCollector" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="GetMessageClaimsExchange" TechnicalProfileReferenceId="UserInputMessageClaimGenerator"/>
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <OrchestrationStep Order="4" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
       </OrchestrationSteps>
     </UserJourney>
   </UserJourneys>
@@ -227,17 +266,18 @@
       <Protocol Name="OpenIdConnect" />
       <OutputClaims>
         <!-- 
-          Two output claims will be added to the JWT token that is being produced by the policy. 
+          Three output claims will be added to the JWT token that is being produced by the policy. 
         The values of these claims are set with the DefaultValue attributes, which will provide a value for a 
         claim if it has not been previously set. 
         -->
-        <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" DefaultValue="Hello World Object ID"/>
+        <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
         <!-- 
           The PartnerClaimType attribute is used to provide a different external name for the 
         claim than what has been used internally in the policy. In this case, the claim name that will be emitted in the 
         token is sub instead of objectId 
         -->
-        <OutputClaim ClaimTypeReferenceId="message" DefaultValue="Hello World!"/>
+        <OutputClaim ClaimTypeReferenceId="displayName" />
+        <OutputClaim ClaimTypeReferenceId="message" />
       </OutputClaims>
       <SubjectNamingInfo ClaimType="sub" />
     </TechnicalProfile>
