@@ -7,9 +7,9 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
   PolicySchemaVersion="0.3.0.0"
-  TenantId="thegreatcompanyb2c.onmicrosoft.com"
+  TenantId="${tenant_name}.onmicrosoft.com"
   PolicyId="B2C_1A_Example"
-  PublicPolicyUri="http://thegreatcompanyb2c.onmicrosoft.com/B2C_1A_Example">
+  PublicPolicyUri="http://${tenant_name}.onmicrosoft.com/B2C_1A_Example">
     <BuildingBlocks>
       <ClaimsSchema>
         <ClaimType Id="objectId">
