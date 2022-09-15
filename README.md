@@ -28,3 +28,9 @@ Form more information, have a look at the [online documentation](https://docs.mi
 Terraform is used in this project to deploy the backend state first.
 
 ![Terraform backend state](./assets/images/terraform-backend-state.png)
+
+The provider used is [pjfebbraro/azureadb2cief](https://registry.terraform.io/providers/pjfebbraro/azureadb2cief/0.2.0).
+
+### More about the Terraform provider
+
+You can look at the GitHub repository of the Terraform provider itself. There are many [examples](https://github.com/pjfebbraro/terraform-provider-azureadb2cief/tree/main/examples) to implement compliant policies with the IEF framework. Be aware that the XML files are complementary to each other (TrustFrameworkExtensions extends TrustFrameworkBase).
