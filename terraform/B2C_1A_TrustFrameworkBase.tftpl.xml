@@ -8,8 +8,8 @@
   xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
   PolicySchemaVersion="0.3.0.0"
   TenantId="${tenant_name}.onmicrosoft.com"
-  PolicyId="B2C_1A_Example"
-  PublicPolicyUri="http://${tenant_name}.onmicrosoft.com/B2C_1A_Example">
+  PolicyId="B2C_1A_TrustFrameworkBase"
+  PublicPolicyUri="http://${tenant_name}.onmicrosoft.com/B2C_1A_TrustFrameworkBase">
     <BuildingBlocks>
       <ClaimsSchema>
         <ClaimType Id="objectId">
@@ -233,10 +233,10 @@
   <UserJourneys>
     <!-- 
       User Journeys specify the steps that a policy will follow when it is called. In this case, 
-    the User Journey has been given the ID HelloWorldJourney, which will be used to reference it 
+    the User Journey has been given the ID SalutationJourney, which will be used to reference it 
     later in the policy 
     -->
-    <UserJourney Id="HelloWorldJourney">
+    <UserJourney Id="SalutationJourney">
       <OrchestrationSteps>
         <OrchestrationStep Order="1" Type="ClaimsExchange">
           <ClaimsExchanges>
@@ -258,10 +258,10 @@
     </UserJourney>
   </UserJourneys>
   <RelyingParty>
-  <!-- The RelyingParty element includes a DefaultUserJourney element that references the HelloWorldJourney User Journey -->
-    <DefaultUserJourney ReferenceId="HelloWorldJourney"/>
-    <TechnicalProfile Id="HelloWorldPolicyProfile">
-      <DisplayName>Hello World Policy Profile</DisplayName>
+  <!-- The RelyingParty element includes a DefaultUserJourney element that references the SalutationJourney User Journey -->
+    <DefaultUserJourney ReferenceId="SalutationJourney"/>
+    <TechnicalProfile Id="SalutationPolicyProfile">
+      <DisplayName>Salutation Policy Profile</DisplayName>
       <!-- The OpenIdConnect protocol is to be used for exchanges with this policy -->
       <Protocol Name="OpenIdConnect" />
       <OutputClaims>
